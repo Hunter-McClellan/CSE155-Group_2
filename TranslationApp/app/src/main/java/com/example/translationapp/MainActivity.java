@@ -1,8 +1,12 @@
 package com.example.translationapp;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,33 +29,27 @@ import okhttp3.Response;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.Gson;
-
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import androidx.camera.view.PreviewView;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import androidx.camera.core.*;
 import androidx.camera.lifecycle.ProcessCameraProvider;
-import androidx.camera.video.*;
-import androidx.camera.video.VideoCapture;
-import androidx.core.content.PermissionChecker;
 import androidx.lifecycle.LifecycleOwner;
 
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import android.provider.MediaStore;
+//import com.google.mlkit.vision.demo.GraphicOverlay;
+//import com.google.mlkit.vision.demo.java.VisionProcessorBase;
+//import com.google.mlkit.vision.demo.preference.PreferenceUtils;
+
+
 import android.media.Image;
 
 public class MainActivity extends AppCompatActivity {
@@ -70,12 +68,36 @@ public class MainActivity extends AppCompatActivity {
     // camera vars
     private PreviewView previewView;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
+    private Camera camera;
+    private Image image;
+    private int imagerot;
 
+    private ImageCapture imageCapture;
+
+    private final TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);;
+
+    private Context context;
+
+    private boolean home;
+
+    public MainActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_home);
+        home = true;
+
+
+        //transcribe = new TextFromImage();
+
+        context = this;
+
+        //recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+
+        imageCapture = new ImageCapture.Builder()
+                .build();
 
         // camera handling from here on out
         previewView = findViewById(R.id.previewView);
@@ -93,7 +115,38 @@ public class MainActivity extends AppCompatActivity {
             }
         }, ContextCompat.getMainExecutor(this));
 
+        Button translate = findViewById(R.id.translate);
 
+        translate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Executor cameraExecutor = Executors.newSingleThreadExecutor();
+
+
+
+
+
+                imageCapture.takePicture(ContextCompat.getMainExecutor(context), new ImageCapture.OnImageCapturedCallback() {
+                    @SuppressLint("UnsafeOptInUsageError")
+                    @Override
+                    public void onCaptureSuccess(@NonNull ImageProxy imageP) {
+                        System.out.println("took image");
+                        handleImage(imageP);
+                        super.onCaptureSuccess(imageP);
+                        imageP.close();
+                    }
+
+                    @Override
+                    public void onError(@NonNull ImageCaptureException exception) {
+                        System.out.println(exception);
+                        super.onError(exception);
+                    }
+                });
+
+                //
+
+            }
+        });
 
 
         // update this to use real layout later
@@ -126,6 +179,62 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // new method should switch views, call text from image, and call the translator
+    @SuppressLint("UnsafeOptInUsageError")
+    void handleImage (ImageProxy imageP) {
+        // old method for transcribing image
+        //transcribe.analyzeImage(imageP.getImage(), imageP.getImageInfo().getRotationDegrees());
+
+        InputImage image = InputImage.fromMediaImage(imageP.getImage(), imageP.getImageInfo().getRotationDegrees());
+
+        // gets
+        Task<Text> result =
+                recognizer.process(image)
+                        .addOnSuccessListener(new OnSuccessListener<Text>() {
+                            @Override
+                            public void onSuccess(Text visionText) {
+                                // call translate on success
+                                translate(visionText.getText());
+
+                            }
+                        })
+                        .addOnFailureListener(
+                                new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        System.out.println("transcription failed");
+                                    }
+                                });
+
+        //System.out.println(originalText);
+    }
+
+    void translate (String inputText) {
+        originalText = inputText;
+        setContentView(R.layout.fragment_dashboard);
+        home = false;
+
+        TextView untranslated = findViewById(R.id.untranslated);
+        translatedTv = findViewById(R.id.translated);
+
+        untranslated.setText(inputText);
+
+        try {
+            String textToTranslate = inputText;
+
+            // Serialize request
+            Gson gson = new Gson();
+            String[] text = {textToTranslate};
+            String postBody = gson.toJson(new TranslateRequest(text, "en"));
+
+            Log.d("MyActivity", postBody);
+
+            postRequest(postUrl,postBody);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
         Preview preview = new Preview.Builder()
                 .build();
@@ -136,7 +245,8 @@ public class MainActivity extends AppCompatActivity {
 
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
-        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, preview);
+        camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, preview);
+        cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, imageCapture);
     }
 
 
@@ -165,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
                 TranslationResponse res = gson.fromJson(responseBody, TranslationResponse.class);
                 String[] translations = res.getData().getTranslatedStrings();
                 // Updates translated text box from UIThread
+                //translatedTv.setText(translations[0]);
                 translatedTv.post(new Runnable() {
                                       @Override
                                       public void run() {
