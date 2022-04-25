@@ -2,9 +2,14 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.translationapp">
+
+
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <uses-feature android:name="android.hardware.camera"
                 android:required="true" />
 
@@ -25,10 +30,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="ocr" />
         <meta-data
+
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
     </application>
