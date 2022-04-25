@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
@@ -22,7 +23,36 @@ import okhttp3.RequestBody;
 import okhttp3.MediaType;
 import okhttp3.Response;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.Gson;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+
+import androidx.camera.view.PreviewView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import androidx.camera.core.*;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.video.*;
+import androidx.camera.video.VideoCapture;
+import androidx.core.content.PermissionChecker;
+import androidx.lifecycle.LifecycleOwner;
+
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import android.provider.MediaStore;
+import android.media.Image;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,19 +61,47 @@ public class MainActivity extends AppCompatActivity {
     private String originalText;
     private String translatedText;
 
+
     private static final String key = "AIzaSyClSfDF8l5HGXYaUbz1I9AjtmMBTsZgZDA";
     private static final String postUrl = "https://translation.googleapis.com/language/translate/v2?key=" + key;
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
+    // camera vars
+    private PreviewView previewView;
+    private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.fragment_home);
 
-        inputToTranslate = findViewById(R.id.inputToTranslate);
+        // camera handling from here on out
+        previewView = findViewById(R.id.previewView);
+        cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+
+        cameraProviderFuture.addListener(() -> {
+            try {
+                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                bindPreview(cameraProvider);
+                System.out.println("camera should be working now");
+            } catch (ExecutionException | InterruptedException e) {
+                // No errors need to be handled for this Future.
+                // This should never be reached.
+                System.out.println("Theres an issue");
+            }
+        }, ContextCompat.getMainExecutor(this));
+
+
+
+
+        // update this to use real layout later
+        /*inputToTranslate = findViewById(R.id.inputToTranslate);
         translatedTv = findViewById(R.id.translatedTv);
         Button translateButton = findViewById(R.id.translateButton);
+
+
 
         translateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,8 +121,24 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-        });
+        });*/
+
+
     }
+
+    void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
+        Preview preview = new Preview.Builder()
+                .build();
+
+        CameraSelector cameraSelector = new CameraSelector.Builder()
+                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .build();
+
+        preview.setSurfaceProvider(previewView.getSurfaceProvider());
+
+        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, preview);
+    }
+
 
     void postRequest(String postUrl,String postBody) throws IOException {
         // Create request and post to Google Cloud Translate API
