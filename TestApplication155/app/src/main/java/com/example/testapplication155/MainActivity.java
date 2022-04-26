@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.testapplication155.ui.dashboard.DashboardFragment;
+import com.example.testapplication155.ui.home.HomeFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -176,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onSuccess(Text visionText) {
                                 // call translate on success
                                 System.out.println("img processed");
-                                //translate(visionText.getText());
+                                translate(visionText.getText());
 
 
                             }
@@ -238,10 +240,14 @@ public class MainActivity extends AppCompatActivity {
                 // Updates translated text box
                 Log.d("Translation", translations[0]);
 
-                TextView view = findViewById(R.id.translateview);
-                view.setText(translations[0]);
+                //TextView view = findViewById(R.id.translateview);
+                //view.setText(translations[0]);
             }
         });
+        getSupportFragmentManager().beginTransaction()
+                .remove()
+                .replace(R.id.nav_host_fragment_activity_main, DashboardFragment.class, null)
+                .commit();
     }
 
 }
