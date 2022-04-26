@@ -115,8 +115,8 @@ public class MainActivity extends AppCompatActivity {
     public void translatebutton(View view) {
         // Do something in response to button click
         TextView tview = findViewById(R.id.translateview);
-        tview.setText("button pressed");
-
+        translate("hola, como estas");
+        //tview.setText("button pressed");
     }
 
 
@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onSuccess(Text visionText) {
                                 // call translate on success
                                 System.out.println("img processed");
-                                translate(visionText.getText());
+                                //translate(visionText.getText());
 
 
                             }
@@ -193,29 +193,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void translate (String inputText) {
-        String originalText = inputText;
-        System.out.println(inputText);
-        //setContentView(R.layout.fragment_dashboard);
-
-        //TextView untranslated = findViewById(R.id.untranslated);
-        //translatedTv = findViewById(R.id.translated);
-
-        //untranslated.setText(inputText);
-
-        //try {
+        Log.d("Translation", inputText);
+        try {
             String textToTranslate = inputText;
 
             // Serialize request
             Gson gson = new Gson();
             String[] text = {textToTranslate};
-            //String postBody = gson.toJson(new TranslateRequest(text, "en"));
+            String postBody = gson.toJson(new TranslateRequest(text, "en"));
 
-            //Log.d("MyActivity", postBody);
+            Log.d("Translation", postBody);
 
-            //postRequest(postUrl,postBody);
-        //} catch (IOException e) {
-         //   e.printStackTrace();
-        //}
+            postRequest(postUrl,postBody);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     void postRequest(String postUrl,String postBody) throws IOException {
@@ -240,16 +232,14 @@ public class MainActivity extends AppCompatActivity {
 
                 // Deserialize JSON
                 Gson gson = new Gson();
-                //TranslationResponse res = gson.fromJson(responseBody, TranslationResponse.class);
-                //String[] translations = res.getData().getTranslatedStrings();
-                // Updates translated text box from UIThread
-                //translatedTv.setText(translations[0]);
-                translatedTv.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        //translatedTv.setText(translations[0]);
-                    }
-                });
+                TranslationResponse res = gson.fromJson(responseBody, TranslationResponse.class);
+                String[] translations = res.getData().getTranslatedStrings();
+
+                // Updates translated text box
+                Log.d("Translation", translations[0]);
+
+                TextView view = findViewById(R.id.translateview);
+                view.setText(translations[0]);
             }
         });
     }
