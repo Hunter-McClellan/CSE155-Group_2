@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/cardview_dark_background"
     tools:context=".ui.dashboard.DashboardFragment">
 
     <TextView
@@ -16,7 +17,6 @@
         android:layout_marginBottom="17dp"
         android:background="@drawable/rounded_corner_view_orange"
         android:scrollbars="vertical"
-        android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/textView2"
