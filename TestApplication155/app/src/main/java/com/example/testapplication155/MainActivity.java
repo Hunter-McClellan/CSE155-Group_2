@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         cameraProviderFuture.addListener(() -> {
             try {
                 cameraProvider = cameraProviderFuture.get();
-                bindPreview(cameraProvider);
+                //bindPreview(cameraProvider);
             } catch (ExecutionException | InterruptedException e) {
                 // No errors need to be handled for this Future.
                 // This should never be reached.
@@ -110,9 +110,6 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
-
-
-
     }
 
     public void translatebutton(View view) {
@@ -123,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
+    public void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
         Preview preview = new Preview.Builder()
                 .build();
 
