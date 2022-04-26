@@ -37,6 +37,9 @@ public class DashboardFragment extends Fragment {
         TextView textView = binding.textDashboard;
         textView.setMovementMethod(new ScrollingMovementMethod());
 
+        TextView textView2 = binding.translatedText;
+        textView2.setMovementMethod(new ScrollingMovementMethod());
+
         untrans = ((MainActivity)requireActivity()).originalText;
         trans = ((MainActivity)requireActivity()).translatedText;
 
