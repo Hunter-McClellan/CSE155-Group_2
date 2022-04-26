@@ -115,16 +115,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }, ContextCompat.getMainExecutor(this));
 
+
+
         Button translate = findViewById(R.id.translate);
 
         translate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Executor cameraExecutor = Executors.newSingleThreadExecutor();
-
-
-
-
 
                 imageCapture.takePicture(ContextCompat.getMainExecutor(context), new ImageCapture.OnImageCapturedCallback() {
                     @SuppressLint("UnsafeOptInUsageError")
