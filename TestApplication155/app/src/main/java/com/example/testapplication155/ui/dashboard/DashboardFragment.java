@@ -41,7 +41,7 @@ public class DashboardFragment extends Fragment {
         trans = ((MainActivity)requireActivity()).translatedText;
 
         binding.textDashboard.setText(untrans);
-        binding.translateview.setText(trans);
+        binding.translatedText.setText(trans);
 
         /*Image image = ((MainActivity)requireActivity()).img;
         if (image != null) {

@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void translatebutton(View view) {
         // Do something in response to button click
-        TextView tview = findViewById(R.id.translateview);
+        TextView tview = findViewById(R.id.translatedText);
         translate("hola, como estas");
         //tview.setText("button pressed");
     }
