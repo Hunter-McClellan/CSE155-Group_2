@@ -2,6 +2,7 @@ package com.example.testapplication155;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +27,7 @@ import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -74,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
     private final TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);;
 
     private Context context;
+
+    public Image img;
+    public String originalText = "Go to the previous screen to translate text";
+    public String translatedText = "Translated text will appear here";
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +174,8 @@ public class MainActivity extends AppCompatActivity {
         // old method for transcribing image
         //transcribe.analyzeImage(imageP.getImage(), imageP.getImageInfo().getRotationDegrees());
 
+        img = imageP.getImage();
+
         InputImage image = InputImage.fromMediaImage(imageP.getImage(), imageP.getImageInfo().getRotationDegrees());
 
         // gets
@@ -195,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void translate (String inputText) {
+        originalText = inputText;
         Log.d("Translation", inputText);
         try {
             String textToTranslate = inputText;
@@ -240,14 +249,11 @@ public class MainActivity extends AppCompatActivity {
                 // Updates translated text box
                 Log.d("Translation", translations[0]);
 
+                translatedText = translations[0];
                 //TextView view = findViewById(R.id.translateview);
                 //view.setText(translations[0]);
             }
         });
-        getSupportFragmentManager().beginTransaction()
-                .remove()
-                .replace(R.id.nav_host_fragment_activity_main, DashboardFragment.class, null)
-                .commit();
     }
 
 }
