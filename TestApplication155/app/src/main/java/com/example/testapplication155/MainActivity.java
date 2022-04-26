@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.Image;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -88,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        TextView textView = (TextView) findViewById(R.id.text_dashboard);
+        textView.setMovementMethod(new ScrollingMovementMethod());
 
         // handling the camera stuff
         imageCapture = new ImageCapture.Builder()
