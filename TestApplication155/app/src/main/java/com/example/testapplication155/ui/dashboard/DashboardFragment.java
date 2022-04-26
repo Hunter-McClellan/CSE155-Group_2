@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.testapplication155.MainActivity;
+import com.example.testapplication155.R;
 import com.example.testapplication155.databinding.FragmentDashboardBinding;
 
 public class DashboardFragment extends Fragment {
@@ -31,7 +33,9 @@ public class DashboardFragment extends Fragment {
 
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        
+
+        TextView textView = binding.textDashboard;
+        textView.setMovementMethod(new ScrollingMovementMethod());
 
         untrans = ((MainActivity)requireActivity()).originalText;
         trans = ((MainActivity)requireActivity()).translatedText;
