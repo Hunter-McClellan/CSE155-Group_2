@@ -91,16 +91,19 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        // handling the camera stuff
+        // creates the object that will be used to capture an image
         imageCapture = new ImageCapture.Builder()
                 .build();
 
+        // defines the ui element that will display what the camera sees.
+        // this specific variable is no longer used due to issues caused when modes are switched
         previewView = findViewById(R.id.previewView);
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
 
         // creates the camera provider, used for the preview and images
         cameraProviderFuture.addListener(() -> {
             try {
+
                 cameraProvider = cameraProviderFuture.get();
                 //bindPreview(cameraProvider);
             } catch (ExecutionException | InterruptedException e) {
@@ -111,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         }, ContextCompat.getMainExecutor(this));
 
 
+        // the navigation bar used to indicate and switch modes
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -122,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
+    // this fragment of code is also no longer used, due to issues specified in onCreate
     public void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
         Preview preview = new Preview.Builder()
                 .build();
@@ -135,16 +140,19 @@ public class MainActivity extends AppCompatActivity {
         camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, preview);
     }
 
+    // this method is called when the user presses the take picture button
     public void takePicture(View view) {
+        // binds the cameraProivder to the back camera, allowing for image capture to understand from which camera the image should be captured
         cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, imageCapture);
 
-        // close the image before taking a new one
+        // close the image before taking a new one, if a picture previously existed.
         if (imageProxy != null) {
             imageProxy.close();
         }
+        // actually takes a picture
         imageCapture.takePicture(ContextCompat.getMainExecutor(this), new ImageCapture.OnImageCapturedCallback() {
             @SuppressLint("UnsafeOptInUsageError")
-            @Override
+            @Override // waits for the image to be taken,then transcribes text from it
             public void onCaptureSuccess(@NonNull ImageProxy imageP) {
                 System.out.println("took image");
                 imageProxy = imageP;
@@ -163,20 +171,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     @SuppressLint("UnsafeOptInUsageError")
     void handleImage (ImageProxy imageP) {
         // old method for transcribing image
         //transcribe.analyzeImage(imageP.getImage(), imageP.getImageInfo().getRotationDegrees());
 
+        // converts the image into a usable format
         img = imageP.getImage();
-
         InputImage image = InputImage.fromMediaImage(imageP.getImage(), imageP.getImageInfo().getRotationDegrees());
 
-        // gets
+        // gets the text from the image
         Task<Text> result =
                 recognizer.process(image)
                         .addOnSuccessListener(new OnSuccessListener<Text>() {
-                            @Override
+                            @Override // waits to get the text, then translates it
                             public void onSuccess(Text visionText) {
                                 // call translate on success
                                 System.out.println("img processed");
@@ -202,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             String textToTranslate = inputText;
 
+            // if the user is already on the translate screen, update the text to what they want to see
             TextView view = findViewById(R.id.text_dashboard);
             if (view != null) {
                 view.setText(inputText);

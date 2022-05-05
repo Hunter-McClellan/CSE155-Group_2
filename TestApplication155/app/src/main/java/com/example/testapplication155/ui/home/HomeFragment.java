@@ -47,7 +47,7 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
+        // this begins the process of initializing the previewview
         cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity());
 
         // creates the camera provider, used for the preview and images
@@ -72,6 +72,7 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    // binds the previewview so that it shows what the camera sees
     public void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
         Preview preview = new Preview.Builder()
                 .build();
@@ -90,7 +91,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        cameraProvider.unbindAll();
+        cameraProvider.unbindAll(); // allows the camera to be seen if the user returns to this screen
         cameraProvider = null;
         cameraProviderFuture = null;
         previewView = null;

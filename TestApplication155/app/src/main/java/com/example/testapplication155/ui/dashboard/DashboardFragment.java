@@ -31,15 +31,18 @@ public class DashboardFragment extends Fragment {
         DashboardViewModel dashboardViewModel =
                 new ViewModelProvider(this).get(DashboardViewModel.class);
 
+        // defines everything when it is created
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // sets the text to scroll if the text is too long
         TextView textView = binding.textDashboard;
         textView.setMovementMethod(new ScrollingMovementMethod());
 
         TextView textView2 = binding.translatedText;
         textView2.setMovementMethod(new ScrollingMovementMethod());
 
+        // actually sets the text if its available
         untrans = ((MainActivity)requireActivity()).originalText;
         trans = ((MainActivity)requireActivity()).translatedText;
 
