@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     // stuff for camera
+    // camera based on code from https://developer.android.com/training/camerax/
     public ProcessCameraProvider cameraProvider;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private Camera camera;
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
     // Object to tell Okhttp what format our request body is in
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
+    // mlkit text recognition based on https://developers.google.com/ml-kit/vision/text-recognition/android
     private final TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);;
 
     private Context context;
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         previewView = findViewById(R.id.previewView);
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
 
+        // camera based on code from https://developer.android.com/training/camerax/
         // creates the camera provider, used for the preview and images
         cameraProviderFuture.addListener(() -> {
             try {
@@ -174,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // mlkit text recognition based on https://developers.google.com/ml-kit/vision/text-recognition/android
 
     @SuppressLint("UnsafeOptInUsageError")
     void handleImage (ImageProxy imageP) {
@@ -181,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
         //transcribe.analyzeImage(imageP.getImage(), imageP.getImageInfo().getRotationDegrees());
 
         // converts the image into a usable format
+        // mlkit text recognition based on https://developers.google.com/ml-kit/vision/text-recognition/android
         img = imageP.getImage();
         InputImage image = InputImage.fromMediaImage(imageP.getImage(), imageP.getImageInfo().getRotationDegrees());
 

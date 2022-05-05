@@ -50,6 +50,7 @@ public class HomeFragment extends Fragment {
         // this begins the process of initializing the previewview
         cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity());
 
+        // camera based on code from https://developer.android.com/training/camerax/
         // creates the camera provider, used for the preview and images
         previewView = binding.previewView;
         cameraProviderFuture.addListener(() -> {
