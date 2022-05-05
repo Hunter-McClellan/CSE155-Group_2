@@ -202,6 +202,12 @@ public class MainActivity extends AppCompatActivity {
         try {
             String textToTranslate = inputText;
 
+            TextView view = findViewById(R.id.text_dashboard);
+            if (view != null) {
+                view.setText(inputText);
+            }
+
+
             // Serialize request
             Gson gson = new Gson();
             String[] text = {textToTranslate};
@@ -244,7 +250,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Translation", translations[0]);
 
                 translatedText = translations[0];
-                //TextView view = findViewById(R.id.translateview);
+                TextView view = findViewById(R.id.translatedText);
+                if (view != null) {
+                    view.setText(translations[0]);
+                }
+
                 //view.setText(translations[0]);
             }
         });
