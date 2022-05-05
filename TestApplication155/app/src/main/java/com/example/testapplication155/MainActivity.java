@@ -69,9 +69,12 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView translatedTv;
 
+    // Google Translate API link and key
+    // Followed tutorial at: https://medium.com/@yeksancansu/how-to-use-google-translate-api-in-android-studio-projects-7f09cae320c7
+    // to learn how to get the Google Translate API configured for use, and to get the key
     private static final String key = "AIzaSyClSfDF8l5HGXYaUbz1I9AjtmMBTsZgZDA";
     private static final String postUrl = "https://translation.googleapis.com/language/translate/v2?key=" + key;
-
+    // Object to tell Okhttp what format our request body is in
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private final TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);;
@@ -206,8 +209,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void translate (String inputText) {
-        originalText = inputText;
-        Log.d("Translation", inputText);
+        originalText = inputText; // Saves original text to be displayed in untranslated text box
+        // Debug logging
+        //Log.d("Translation", inputText);
         try {
             String textToTranslate = inputText;
 
@@ -220,11 +224,17 @@ public class MainActivity extends AppCompatActivity {
 
             // Serialize request
             Gson gson = new Gson();
+            // We can send more than one string to translate in a string array here, but we send
+            // only one. The response from the Google Translate API will also be an array of strings
             String[] text = {textToTranslate};
+            // Use the Translate Request class to tell GSON what format to serialize the request
+            // body into
             String postBody = gson.toJson(new TranslateRequest(text, "en"));
 
-            Log.d("Translation", postBody);
+            // Debug logging
+            //Log.d("Translation", postBody);
 
+            // Send request to be posted
             postRequest(postUrl,postBody);
         } catch (IOException e) {
             e.printStackTrace();
@@ -241,11 +251,13 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
+            // Failure callback - cancels request
             @Override
             public void onFailure(Call call, IOException e) {
                 call.cancel();
             }
 
+            // Success callback - sends response (translated text) to the translated text box
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 // Convert response body to string
@@ -253,19 +265,24 @@ public class MainActivity extends AppCompatActivity {
 
                 // Deserialize JSON
                 Gson gson = new Gson();
+                // Tells GSON to parse the response into a TranslationResponse object, which has
+                // a translation data member variable, which in turn has a list of translation text
+                // objects. The translation text objects contain the actual translated strings
                 TranslationResponse res = gson.fromJson(responseBody, TranslationResponse.class);
                 String[] translations = res.getData().getTranslatedStrings();
 
-                // Updates translated text box
-                Log.d("Translation", translations[0]);
+                // Debug logging
+                //Log.d("Translation", translations[0]);
 
+                // Google Translate API can handle an array of strings to translate, but for our
+                // purposes, we're only sending one string in an array, so we grab the first element
+                // of the response array
                 translatedText = translations[0];
+                // Updates translated text box
                 TextView view = findViewById(R.id.translatedText);
                 if (view != null) {
                     view.setText(translations[0]);
                 }
-
-                //view.setText(translations[0]);
             }
         });
     }
